@@ -7,7 +7,6 @@ class LoginScreen(ctk.CTkFrame):
         super().__init__(parent)
         self.on_login = on_login
         
-        # Cargar imagen de assets
         image_path = os.path.join(os.path.dirname(__file__), "..", "assets", "ibero.png")
         
         if os.path.exists(image_path):
