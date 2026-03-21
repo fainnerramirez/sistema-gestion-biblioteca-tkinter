@@ -1,66 +1,79 @@
-from tkinter import *
-from tkinter import ttk
-from tkinter import messagebox
+import customtkinter as ctk
+from modules.login import LoginScreen
+from modules.dashboard import Dashboard
+from modules.books import BooksScreen
+from modules.loans import LoansScreen
+from modules.returns import ReturnsScreen
+from modules.waitlist import WaitlistScreen
 
-# Crear ventana principal
-root = Tk()
-root.title("Mi Aplicación")
-root.geometry("600x400")
-root.resizable(True, True)
+class App(ctk.CTk):
+    def __init__(self):
+        super().__init__()
 
-# Frame principal con padding
-main_frame = ttk.Frame(root, padding=15)
-main_frame.grid(row=0, column=0, sticky=(N, S, E, W))
+        ctk.set_appearance_mode("dark")  
+        self.geometry("1024x550")
+        self.title("Gestion De Biblioteca - Ibero")
+        
+        self.current_screen = None
+        self.role = None
+        self.show_login()
 
-# Configurar para que se adapte al redimensionamiento
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
-main_frame.columnconfigure(1, weight=1)
-
-# Título
-title = ttk.Label(main_frame, text="Ejemplo Simple", 
-                  font=("Arial", 16, "bold"))
-title.grid(row=0, column=0, columnspan=2, pady=(0, 20))
-
-# Etiqueta y campo de entrada
-ttk.Label(main_frame, text="Nombre:").grid(row=1, column=0, sticky=W, pady=10)
-nombre_entry = ttk.Entry(main_frame, width=30)
-nombre_entry.grid(row=1, column=1, sticky=(E, W), pady=10)
-
-ttk.Label(main_frame, text="Mensaje:").grid(row=2, column=0, sticky=W, pady=10)
-mensaje_entry = ttk.Entry(main_frame, width=30)
-mensaje_entry.grid(row=2, column=1, sticky=(E, W), pady=10)
-
-# Función para el botón
-def saludar():
-    nombre = nombre_entry.get()
-    mensaje = mensaje_entry.get()
+    def show_login(self):
+        """Mostrar pantalla de login"""
+        if self.current_screen:
+            self.current_screen.pack_forget()
+        
+        self.current_screen = LoginScreen(self, on_login=self.login_user)
+        self.current_screen.pack(fill="both", expand=True)
     
-    if nombre:
-        resultado = f"Hola {nombre}!"
-        if mensaje:
-            resultado += f"\n{mensaje}"
-        messagebox.showinfo("Saludo", resultado)
-    else:
-        messagebox.showwarning("Error", "Por favor ingresa un nombre")
+    def login_user(self, role):
+        """Almacenar el rol y mostrar el dashboard"""
+        self.role = role
+        self.show_dashboard()
 
-# Función para limpiar campos
-def limpiar():
-    nombre_entry.delete(0, END)
-    mensaje_entry.delete(0, END)
-
-# Frame para botones
-button_frame = ttk.Frame(main_frame)
-button_frame.grid(row=3, column=0, columnspan=2, sticky=(E, W), pady=20)
-
-btn_saludo = ttk.Button(button_frame, text="Saludar", command=saludar)
-btn_saludo.pack(side=LEFT, padx=5)
-
-btn_limpiar = ttk.Button(button_frame, text="Limpiar", command=limpiar)
-btn_limpiar.pack(side=LEFT, padx=5)
-
-btn_salir = ttk.Button(button_frame, text="Salir", command=root.destroy)
-btn_salir.pack(side=RIGHT, padx=5)
+    def show_dashboard(self):
+        """Mostrar pantalla del dashboard"""
+        if self.current_screen:
+            self.current_screen.pack_forget()
+        
+        self.current_screen = Dashboard(self, role=self.role, on_books=self.show_books, on_loans=self.show_loans, on_returns=self.show_returns, on_waitlist=self.show_waitlist, on_logout=self.show_login)
+        self.current_screen.pack(fill="both", expand=True)
+    
+    def show_books(self):
+        """Mostrar pantalla de libros"""
+        if self.current_screen:
+            self.current_screen.pack_forget()
+        
+        self.current_screen = BooksScreen(self, on_back=self.show_dashboard, role=self.role)
+        self.current_screen.pack(fill="both", expand=True)
+        
+    def show_loans(self):
+        """Mostrar pantalla de préstamos"""
+        print("Navigating to Loans section...")
+        if self.current_screen:
+            self.current_screen.pack_forget()
+        
+        self.current_screen = LoansScreen(self, on_back=self.show_dashboard)
+        self.current_screen.pack(fill="both", expand=True)
+        
+    def show_returns(self):
+        """Mostrar pantalla de devoluciones"""
+        print("Navigating to Returns section...")
+        if self.current_screen:
+            self.current_screen.pack_forget()
+        
+        self.current_screen = ReturnsScreen(self, on_back=self.show_dashboard)
+        self.current_screen.pack(fill="both", expand=True)
+        
+    def show_waitlist(self):
+        """Mostrar pantalla de lista de espera"""
+        print("Navigating to Waitlist section...")
+        if self.current_screen:
+            self.current_screen.pack_forget()
+        
+        self.current_screen = WaitlistScreen(self, on_back=self.show_dashboard)
+        self.current_screen.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
-    root.mainloop()
+    app = App()
+    app.mainloop()
