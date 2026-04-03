@@ -22,12 +22,12 @@ Una aplicación de escritorio para gestionar un sistema de biblioteca. Proyecto 
 | # | Funcionalidad | Responsable |
 |---|---|---|
 | 1 | 🔐 Login | Fainner |
-| 2 | 🏠 Dashboard/Homepage | Cristian |
-| 3 | 🔍 Buscar Libro | Cristian |
-| 4 | 📤 Prestar Libro | Miguel |
-| 5 | 📥 Devolver Libro | Miguel |
+| 2 | 🏠 Dashboard/Homepage | Fainner |
+| 3 | 🔍 Buscar Libro | Fainner |
+| 4 | 📤 Prestar Libro | Fainner |
+| 5 | 📥 Devolver Libro | Fainner |
 | 6 | ⏳ Lista de Espera | Fainner |
-| 7 | ⚙️ CRUD Administrador (Crear, Leer, Modificar, Eliminar) | John Ramírez |
+| 7 | ⚙️ CRUD Administrador (Crear, Leer, Modificar, Eliminar) | Fainner |
 
 ---
 
