@@ -12,7 +12,7 @@ class App(ctk.CTk):
 
         ctk.set_appearance_mode("dark")  
         self.geometry("1024x550")
-        self.title("Gestion De Biblioteca - Ibero")
+        self.title("Gestion De Biblioteca - Ibero 2026")
         
         self.current_screen = None
         self.role = None

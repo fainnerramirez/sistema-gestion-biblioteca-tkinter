@@ -129,7 +129,6 @@ class BooksScreen(ctk.CTkFrame):
                 'descripcion': fields['descripcion'].get("1.0", "end-1c")
             }
             
-            # Validaciones
             if not datos['titulo'] or not datos['autor']:
                 print("Error: Título y Autor son requeridos")
                 return
