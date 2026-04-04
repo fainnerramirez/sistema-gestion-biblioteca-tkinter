@@ -83,8 +83,3 @@ class App(ctk.CTk):
 if __name__ == "__main__":
     app = App()
     app.mainloop()
-        
-"""
-funcionalidades que hacen falta:
-- Implementación de la lógica para cada sección (libros, préstamos, devoluciones, lista de espera)
-"""
