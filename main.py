@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import uuid
+from datetime import datetime
 from modules.login import LoginScreen
 from modules.dashboard import Dashboard
 from modules.books import BooksScreen
@@ -20,6 +21,7 @@ class App(ctk.CTk):
                 {"id": uuid.uuid4(), "title": "Cien Años de Soledad", "author": "Gabriel García Márquez", "copies": 3},
                 {"id": uuid.uuid4(), "title": "1984", "author": "George Orwell", "copies": 2}
         ]
+        self.library_loans = []
         self.show_login()
 
     def show_login(self):
@@ -48,7 +50,7 @@ class App(ctk.CTk):
         if self.current_screen:
             self.current_screen.pack_forget()
         
-        self.current_screen = BooksScreen(self, on_back=self.show_dashboard, role=self.role, books=self.library_books)
+        self.current_screen = BooksScreen(self, on_back=self.show_dashboard, role=self.role, books=self.library_books, loans=self.library_loans)
         self.current_screen.pack(fill="both", expand=True)
         
     def show_loans(self):
@@ -57,7 +59,7 @@ class App(ctk.CTk):
         if self.current_screen:
             self.current_screen.pack_forget()
         
-        self.current_screen = LoansScreen(self, on_back=self.show_dashboard)
+        self.current_screen = LoansScreen(self, on_back=self.show_dashboard, loans=self.library_loans)
         self.current_screen.pack(fill="both", expand=True)
         
     def show_returns(self):
@@ -66,7 +68,7 @@ class App(ctk.CTk):
         if self.current_screen:
             self.current_screen.pack_forget()
         
-        self.current_screen = ReturnsScreen(self, on_back=self.show_dashboard)
+        self.current_screen = ReturnsScreen(self, on_back=self.show_dashboard, loans=self.library_loans, books=self.library_books)
         self.current_screen.pack(fill="both", expand=True)
         
     def show_waitlist(self):

@@ -1,14 +1,17 @@
 import uuid
 import customtkinter as ctk
 from tkinter import messagebox
+from datetime import datetime
 
 class BooksScreen(ctk.CTkFrame):
-    def __init__(self, parent, on_back, role="usuario", books=[]):
+    def __init__(self, parent, on_back, role="usuario", books=[], loans=[]):
         super().__init__(parent)
         self.on_back = on_back
         self.role = role
         self.library_books = books
-        self.book_widgets = {}  # Diccionario para guardar referencias a los widgets de cada libro
+        self.library_loans = loans  
+        self.parent = parent  
+        self.book_widgets = {}  
         
         # Título con el rol del usuario
         title_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -311,28 +314,86 @@ class BooksScreen(ctk.CTkFrame):
         """Filtra los libros según el texto de búsqueda"""
         search_text = self.search_entry.get().lower().strip()
         
-        # Si la búsqueda está vacía, mostrar todos los libros
         if not search_text:
             for book_id, widgets in self.book_widgets.items():
                 widgets['frame'].pack(pady=8, padx=10, fill="x")
             return
         
-        # Filtrar y mostrar/ocultar libros
         for book_id, widgets in self.book_widgets.items():
-            # Buscar el libro para obtener su título y autor
             book = next((b for b in self.library_books if b['id'] == book_id), None)
             if book:
-                # Verificar si el texto coincide con título o autor (insensible a mayúsculas)
                 title_match = search_text in book['title'].lower()
                 author_match = search_text in book['author'].lower()
                 
                 if title_match or author_match:
-                    # Mostrar el libro
                     widgets['frame'].pack(pady=8, padx=10, fill="x")
                 else:
-                    # Ocultar el libro
                     widgets['frame'].pack_forget()
     
     def loan_book(self, book):
-        print(f"Usuario: Prestar libro - {book}")
+        """Abre un diálogo para registrar un préstamo"""
+        # Validar que hay copias disponibles
+        if book['copies'] <= 0:
+            messagebox.showerror("Sin copias", f"Lo sentimos, '{book['title']}' no tiene copias disponibles")
+            return
+        
+        # Crear diálogo para ingresar nombre del usuario
+        dialog = ctk.CTkToplevel(self)
+        dialog.title("Registrar Préstamo")
+        dialog.geometry("400x200")
+        dialog.resizable(False, False)
+        dialog.grab_set()
+        dialog.transient(self.master)
+        
+        # Título
+        title_label = ctk.CTkLabel(dialog, text=f"Préstamo: {book['title']}", font=("Arial", 14, "bold"))
+        title_label.pack(pady=15)
+        
+        # Label y entrada para nombre del usuario
+        ctk.CTkLabel(dialog, text="Nombre del usuario:", font=("Arial", 11)).pack(anchor="w", padx=20, pady=(10, 0))
+        user_entry = ctk.CTkEntry(dialog, placeholder_text="Ej: Juan Pérez")
+        user_entry.pack(fill="x", padx=20, pady=(0, 15))
+        
+        # Frame para botones
+        button_frame = ctk.CTkFrame(dialog, fg_color="transparent")
+        button_frame.pack(pady=15, fill="x", padx=20)
+        
+        def confirmar_prestamo():
+            user_name = user_entry.get().strip()
+            if not user_name:
+                messagebox.showerror("Error", "Por favor ingrese el nombre del usuario")
+                return
+            
+            # Crear registro de préstamo
+            loan_record = {
+                'book_id': book['id'],
+                'title': book['title'],
+                'author': book['author'],
+                'user': user_name,
+                'loan_date': datetime.now().strftime("%Y-%m-%d")
+            }
+            
+            # Agregar a la lista de préstamos
+            self.library_loans.append(loan_record)
+            
+            # Descontar una copia del libro
+            book['copies'] -= 1
+            self.refresh_book_widget(book['id'])
+            
+            # Cerrar diálogo
+            dialog.destroy()
+            
+            # Mostrar confirmación
+            messagebox.showinfo("Éxito", f"'{book['title']}' ha sido prestado a {user_name}\nCopias disponibles: {book['copies']}")
+        
+        # Botón Confirmar
+        confirm_btn = ctk.CTkButton(button_frame, text="Confirmar Préstamo", fg_color="#2b5f2b", 
+                                    hover_color="#1e4620", command=confirmar_prestamo)
+        confirm_btn.pack(side="left", padx=5, fill="x", expand=True)
+        
+        # Botón Cancelar
+        cancel_btn = ctk.CTkButton(button_frame, text="Cancelar", fg_color="#7f2b2b", 
+                                   hover_color="#601a1a", command=dialog.destroy)
+        cancel_btn.pack(side="left", padx=5, fill="x", expand=True)
+        
 
