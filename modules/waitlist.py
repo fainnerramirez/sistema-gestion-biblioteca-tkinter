@@ -1,5 +1,3 @@
-# Lista de espera
-
 import customtkinter as ctk
 
 class WaitlistScreen(ctk.CTkFrame):
@@ -18,7 +16,6 @@ class WaitlistScreen(ctk.CTkFrame):
         waitlist_title = ctk.CTkLabel(waitlist_frame, text="Usuarios en Lista de Espera", font=("Arial", 14, "bold"))
         waitlist_title.pack(pady=10)
         
-        # Aquí iría una tabla con usuarios en lista de espera (simulado por ahora)
         sample_waitlist = ["1. Juan Pérez - El Quijote", 
                            "2. María López - Cien Años de Soledad",
                            "3. Carlos García - 1984"]
