@@ -1,1 +1,0 @@
-# Préstamo - Miguel
