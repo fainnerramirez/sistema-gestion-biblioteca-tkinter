@@ -11,7 +11,7 @@ Una aplicación de escritorio para gestionar un sistema de biblioteca. Proyecto 
 | **Lenguaje** | Python 3.8+ |
 | **Frontend** | Tkinter (Aplicación de Escritorio) |
 | **Lógica** | Python |
-| **Testing** | Playwright para Python |
+| **Testing** | pytest + unittest.mock |
 
 ---
 
@@ -87,22 +87,58 @@ python3 main.py
 ## 🧪 Testing y Depuración
 
 ### Herramienta de Testing
-- **Framework**: Playwright para Python
-- **Propósito**: Automatización de pruebas E2E de la interfaz Tkinter
+- **Framework**: pytest + unittest.mock
+- **Propósito**: Testing de eventos y UI de Tkinter
 - **Instalación**:
 ```bash
-pip install playwright
-playwright install
+pip install pytest pytest-mock
 ```
 
 **Ejemplo básico de prueba:**
 ```python
-from playwright.sync_api import sync_playwright
+import pytest
+import tkinter as tk
+from unittest.mock import MagicMock
+from modules.books import BooksScreen
 
-def test_login():
-    with sync_playwright() as p:
-        # Tu código de prueba aquí
-        pass
+def test_buscar_libro():
+    """Test que simula buscar un libro"""
+    root = tk.Tk()
+    root.withdraw()
+    
+    libros = [
+        {"id": "1", "title": "El Quijote", "author": "Cervantes", "copies": 5}
+    ]
+    
+    books_screen = BooksScreen(
+        root,
+        on_back=MagicMock(),
+        role="usuario",
+        books=libros,
+        loans=[]
+    )
+    books_screen.pack(fill="both", expand=True)
+    root.update()
+    
+    # Simular escritura en entry
+    books_screen.search_entry.insert(0, "Quijote")
+    books_screen.search_books()
+    
+    assert books_screen.search_entry.get() == "Quijote"
+    
+    root.destroy()
+```
+
+### Ejecutar Tests
+```bash
+# Todos los tests
+pytest tests/ -v
+
+# Test específico
+pytest tests/test_books_screen.py::test_buscar_libro -v
+
+# Con cobertura
+pytest tests/ --cov=modules --cov-report=html
 ```
 
 ---
@@ -118,29 +154,21 @@ gestion-biblioteca/
 │   └── test_cases.py
 ├── modules/               # Módulos de lógica
 │   ├── auth.py           # Autenticación (Fainner)
-│   ├── dashboard.py      # Dashboard (Cristian)
-│   ├── search.py         # Búsqueda (Cristian)
-│   ├── lending.py        # Préstamo (Miguel)
-│   ├── returns.py        # Devoluciones (Miguel)
+│   ├── dashboard.py      # Dashboard (Fainner)
+│   ├── search.py         # Búsqueda (Fainner)
+│   ├── lending.py        # Préstamo (Fainner)
+│   ├── returns.py        # Devoluciones (Fainner)
 │   ├── waitlist.py       # Lista de espera (Fainner)
-│   └── admin.py          # CRUD Admin (John Ramírez)
+│   └── admin.py          # CRUD Admin (Fainner)
 └── ui/                    # Componentes de interfaz
     ├── styles.py          # Estilos y colores
     └── components.py      # Widgets personalizados
 ```
 
----
-
-## 👥 Equipo de Desarrollo
-
-| Miembro | Responsabilidad |
-|---------|-----------------|
-| 🔐 Fainner | Login, Lista de Espera |
-| 📊 Cristian | Dashboard, Búsqueda de Libros |
-| 📦 Miguel | Préstamo y Devolución de Libros |
-| ⚙️ John Ramírez | CRUD del Administrador |
-
----
+customtkinter>=5.0.0
+Pillow>=9.0.0
+pytest>=7.0.0
+pytest-mock>=3.1
 
 ## 💡 Recomendaciones de Desarrollo
 
@@ -165,7 +193,6 @@ gestion-biblioteca/
 
 ```
 tkinter (incluido en Python)
-playwright>=1.40.0
 pytest>=7.0.0
 ```
 
@@ -192,13 +219,11 @@ pip install -r requirements.txt
 
 Si tienes dudas:
 - Revisa la documentación de [Tkinter](https://docs.python.org/3/library/tkinter.html)
-- Consulta la documentación de [Playwright](https://playwright.dev/python/)
-- Comunícate con tu equipo
 
 ---
 
 **Proyecto**: Sistema de Gestión de Biblioteca  
 **Curso**: Estructura de Datos 2026  
-**Universidad**: Iberoamericana  
+**Universidad**: Corporación Universitaria Iberoamericana  
 **Versión**: 1.0  
 **Última actualización**: Marzo 2026
