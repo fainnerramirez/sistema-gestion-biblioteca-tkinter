@@ -226,4 +226,4 @@ Si tienes dudas:
 **Curso**: Estructura de Datos 2026  
 **Universidad**: Corporación Universitaria Iberoamericana  
 **Versión**: 1.0  
-**Última actualización**: Marzo 2026
+**Última actualización**: Abril 2026
