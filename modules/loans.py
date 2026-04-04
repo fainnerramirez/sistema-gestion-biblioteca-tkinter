@@ -9,7 +9,6 @@ class LoansScreen(ctk.CTkFrame):
         title_label = ctk.CTkLabel(self, text="Gestión de Préstamos", font=("Arial", 24, "bold"))
         title_label.pack(pady=20)
         
-        # Aquí iría la lógica para mostrar préstamos activos (simulado por ahora)
         sample_loans = ["1. Juan Pérez - El Quijote - 2024-06-01", 
                         "2. María López - Cien Años de Soledad - 2024-06-05"]
         
