@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import uuid
 from modules.login import LoginScreen
 from modules.dashboard import Dashboard
 from modules.books import BooksScreen
@@ -9,13 +10,16 @@ from modules.waitlist import WaitlistScreen
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-
         ctk.set_appearance_mode("dark")  
         self.geometry("1024x550")
         self.title("Gestion De Biblioteca - Ibero 2026")
-        
         self.current_screen = None
         self.role = None
+        self.library_books = [
+                {"id": uuid.uuid4(), "title": "El Quijote", "author": "Miguel de Cervantes", "copies": 5},
+                {"id": uuid.uuid4(), "title": "Cien Años de Soledad", "author": "Gabriel García Márquez", "copies": 3},
+                {"id": uuid.uuid4(), "title": "1984", "author": "George Orwell", "copies": 2}
+        ]
         self.show_login()
 
     def show_login(self):
@@ -44,7 +48,7 @@ class App(ctk.CTk):
         if self.current_screen:
             self.current_screen.pack_forget()
         
-        self.current_screen = BooksScreen(self, on_back=self.show_dashboard, role=self.role)
+        self.current_screen = BooksScreen(self, on_back=self.show_dashboard, role=self.role, books=self.library_books)
         self.current_screen.pack(fill="both", expand=True)
         
     def show_loans(self):
@@ -77,3 +81,8 @@ class App(ctk.CTk):
 if __name__ == "__main__":
     app = App()
     app.mainloop()
+        
+"""
+funcionalidades que hacen falta:
+- Implementación de la lógica para cada sección (libros, préstamos, devoluciones, lista de espera)
+"""
