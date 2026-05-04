@@ -1,17 +1,15 @@
-# Devoluciones
 import customtkinter as ctk
 from tkinter import messagebox
 
 class ReturnsScreen(ctk.CTkFrame):
-    def __init__(self, parent, on_back, loans=[], books=[]):
+    def __init__(self, parent, on_back, biblioteca=None):
         super().__init__(parent)
         self.on_back = on_back
-        self.library_loans = loans
-        self.library_books = books
+        self.biblioteca = biblioteca
         self.return_widgets = {} 
         
         # Título
-        title_label = ctk.CTkLabel(self, text="Registrar Devolución", font=("Arial", 24, "bold"))
+        title_label = ctk.CTkLabel(self, text="Registrar Devolución (Sistema de Grafos)", font=("Arial", 24, "bold"))
         title_label.pack(pady=20)
         
         loans_frame = ctk.CTkFrame(self, fg_color="#2b2b2b", corner_radius=10)
@@ -23,9 +21,12 @@ class ReturnsScreen(ctk.CTkFrame):
         self.items_frame = ctk.CTkFrame(loans_frame, fg_color="transparent")
         self.items_frame.pack(padx=10, pady=10, fill="both", expand=True)
         
-        if self.library_loans:
-            for idx, loan in enumerate(self.library_loans, 1):
-                self.add_loan_item(idx, loan)
+        # Obtener préstamos activos del grafo
+        prestamos = self.biblioteca.obtener_prestamos()
+        
+        if prestamos:
+            for idx, prestamo in enumerate(prestamos, 1):
+                self.add_loan_item(idx, prestamo)
         else:
             empty_label = ctk.CTkLabel(self.items_frame, text="No hay préstamos pendientes", font=("Arial", 12), text_color="#888888")
             empty_label.pack(pady=20)
@@ -34,18 +35,18 @@ class ReturnsScreen(ctk.CTkFrame):
                                     fg_color="#cc3333", hover_color="#aa2222")
         back_button.pack(pady=20)
     
-    def add_loan_item(self, idx, loan):
+    def add_loan_item(self, idx, prestamo):
         """Agrega un item de préstamo a la pantalla"""
         item_frame = ctk.CTkFrame(self.items_frame, fg_color="#1a1a1a", corner_radius=5)
         item_frame.pack(pady=8, fill="x")
         
         # Info del préstamo
-        info_text = f"{idx}. {loan['user']} - {loan['title']} ({loan['author']}) - Prestado: {loan['loan_date']}"
+        info_text = f"{idx}. {prestamo['user']} - {prestamo['title']} ({prestamo['author']}) - Prestado: {prestamo['loan_date']}"
         info_label = ctk.CTkLabel(item_frame, text=info_text, font=("Arial", 11))
         info_label.pack(side="left", padx=10, pady=10)
         
         def devolver_libro():
-            self.return_book(loan, item_frame, idx)
+            self.return_book(prestamo, item_frame, idx)
         
         return_btn = ctk.CTkButton(item_frame, text="Devolver", width=80, fg_color="#2b5f2b", 
                                    hover_color="#1e4620", command=devolver_libro)
@@ -56,18 +57,27 @@ class ReturnsScreen(ctk.CTkFrame):
             'label': info_label
         }
     
-    def return_book(self, loan, item_frame, idx):
+    def return_book(self, prestamo, item_frame, idx):
         """Procesa la devolución de un libro"""
-        book = next((b for b in self.library_books if b['id'] == loan['book_id']), None)
-        if book:
-            book['copies'] += 1
-            self.library_loans.remove(loan)
+        # Procesar la devolución en el grafo
+        book_id = prestamo['book_id']
+        libro = self.biblioteca.obtener_libro(book_id)
+        
+        if libro:
+            # Devolver el préstamo
+            prestamo_id = prestamo['id']
+            self.biblioteca.devolver_prestamo(prestamo_id)
+            
+            # Eliminar el widget
             item_frame.destroy()
             del self.return_widgets[idx]
+            
             messagebox.showinfo("Devolución Registrada", 
-                              f"'{loan['title']}' ha sido devuelto por {loan['user']}\n"
-                              f"Copias disponibles: {book['copies']}")
-            if not self.library_loans:
+                              f"'{prestamo['title']}' ha sido devuelto por {prestamo['user']}\n"
+                              f"Copias disponibles: {libro['copies']}")
+            
+            # Si no hay más préstamos, mostrar mensaje
+            if not self.biblioteca.obtener_prestamos():
                 empty_label = ctk.CTkLabel(self.items_frame, text="No hay préstamos pendientes", 
                                           font=("Arial", 12), text_color="#888888")
                 empty_label.pack(pady=20)

@@ -1,13 +1,13 @@
 import customtkinter as ctk
 
 class LoansScreen(ctk.CTkFrame):
-    def __init__(self, parent, on_back, loans=[]):
+    def __init__(self, parent, on_back, biblioteca=None):
         super().__init__(parent)
         self.on_back = on_back
-        self.library_loans = loans
+        self.biblioteca = biblioteca
         
         # Título
-        title_label = ctk.CTkLabel(self, text="Gestión de Préstamos", font=("Arial", 24, "bold"))
+        title_label = ctk.CTkLabel(self, text="Gestión de Préstamos (Sistema de Grafos)", font=("Arial", 24, "bold"))
         title_label.pack(pady=20)
         
         # Frame para lista de préstamos con scrollbar
@@ -21,12 +21,15 @@ class LoansScreen(ctk.CTkFrame):
         scroll_frame = ctk.CTkFrame(loans_frame)
         scroll_frame.pack(padx=10, pady=10, fill="both", expand=True)
         
-        if self.library_loans:
-            for idx, loan in enumerate(self.library_loans, 1):
+        # Obtener préstamos activos del grafo
+        prestamos = self.biblioteca.obtener_prestamos()
+        
+        if prestamos:
+            for idx, prestamo in enumerate(prestamos, 1):
                 loan_item = ctk.CTkFrame(scroll_frame, fg_color="#1a1a1a", corner_radius=5)
                 loan_item.pack(pady=8, fill="x")
                 
-                loan_text = f"{idx}. {loan['user']} - {loan['title']} - {loan['loan_date']}"
+                loan_text = f"{idx}. {prestamo['user']} - {prestamo['title']} ({prestamo['author']}) - Prestado: {prestamo['loan_date']}"
                 loan_label = ctk.CTkLabel(loan_item, text=loan_text, font=("Arial", 11))
                 loan_label.pack(pady=10, padx=10)
         else:

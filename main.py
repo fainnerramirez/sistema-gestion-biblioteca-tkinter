@@ -1,12 +1,11 @@
 import customtkinter as ctk
-import uuid
-from datetime import datetime
 from modules.login import LoginScreen
 from modules.dashboard import Dashboard
 from modules.books import BooksScreen
 from modules.loans import LoansScreen
 from modules.returns import ReturnsScreen
 from modules.waitlist import WaitlistScreen
+from modules.biblioteca import GestorBiblioteca
 
 class App(ctk.CTk):
     def __init__(self):
@@ -16,13 +15,20 @@ class App(ctk.CTk):
         self.title("Gestion De Biblioteca - Ibero 2026")
         self.current_screen = None
         self.role = None
-        self.library_books = [
-                {"id": uuid.uuid4(), "title": "El Quijote", "author": "Miguel de Cervantes", "copies": 5},
-                {"id": uuid.uuid4(), "title": "Cien Años de Soledad", "author": "Gabriel García Márquez", "copies": 3},
-                {"id": uuid.uuid4(), "title": "1984", "author": "George Orwell", "copies": 2}
-        ]
-        self.library_loans = []
+        
+        # Inicializar el gestor de biblioteca con grafos
+        self.biblioteca = GestorBiblioteca()
+        
+        # Cargar datos iniciales
+        self._cargar_datos_iniciales()
+        
         self.show_login()
+    
+    def _cargar_datos_iniciales(self):
+        """Carga los libros iniciales en el sistema"""
+        self.biblioteca.agregar_libro("El Quijote", "Miguel de Cervantes", 5, "Novela clásica española")
+        self.biblioteca.agregar_libro("Cien Años de Soledad", "Gabriel García Márquez", 3, "Novela de realismo mágico")
+        self.biblioteca.agregar_libro("1984", "George Orwell", 2, "Novela distópica")
 
     def show_login(self):
         """Mostrar pantalla de login"""
@@ -50,7 +56,7 @@ class App(ctk.CTk):
         if self.current_screen:
             self.current_screen.pack_forget()
         
-        self.current_screen = BooksScreen(self, on_back=self.show_dashboard, role=self.role, books=self.library_books, loans=self.library_loans)
+        self.current_screen = BooksScreen(self, on_back=self.show_dashboard, role=self.role, biblioteca=self.biblioteca)
         self.current_screen.pack(fill="both", expand=True)
         
     def show_loans(self):
@@ -59,7 +65,7 @@ class App(ctk.CTk):
         if self.current_screen:
             self.current_screen.pack_forget()
         
-        self.current_screen = LoansScreen(self, on_back=self.show_dashboard, loans=self.library_loans)
+        self.current_screen = LoansScreen(self, on_back=self.show_dashboard, biblioteca=self.biblioteca)
         self.current_screen.pack(fill="both", expand=True)
         
     def show_returns(self):
@@ -68,7 +74,7 @@ class App(ctk.CTk):
         if self.current_screen:
             self.current_screen.pack_forget()
         
-        self.current_screen = ReturnsScreen(self, on_back=self.show_dashboard, loans=self.library_loans, books=self.library_books)
+        self.current_screen = ReturnsScreen(self, on_back=self.show_dashboard, biblioteca=self.biblioteca)
         self.current_screen.pack(fill="both", expand=True)
         
     def show_waitlist(self):
@@ -77,7 +83,7 @@ class App(ctk.CTk):
         if self.current_screen:
             self.current_screen.pack_forget()
         
-        self.current_screen = WaitlistScreen(self, on_back=self.show_dashboard)
+        self.current_screen = WaitlistScreen(self, on_back=self.show_dashboard, biblioteca=self.biblioteca)
         self.current_screen.pack(fill="both", expand=True)
 
 if __name__ == "__main__":
